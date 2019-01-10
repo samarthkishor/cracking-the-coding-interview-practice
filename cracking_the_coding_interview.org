@@ -1,0 +1,1072 @@
+#+TITLE: Cracking the Coding Interview Solutions
+#+AUTHOR: Samarth Kishor
+
+Solutions for /Cracking the Coding Interview/ (6th Edition) problems. I did these in whichever language I felt was easiest for the specific problem using a literate programming format with =org-mode=.
+
+Languages used:
+- Python: great for string manipulations and concise imperative code
+- C++: great for low-level memory management, OOP, and data structures
+- JavaScript (node.js): gets the job done for functional programming in an understandable way
+- Common Lisp: great for list manipulations, functional programming, and multi-paradigm programming
+
+* Arrays and Strings
+
+** Is Unique
+
+   Implement an algorithm to determine if a string has all unique characters. What if you cannot use additional data structures?
+
+   #+BEGIN_SRC python :results output
+     def is_unique(string):
+         return len(set(string)) == len(string)
+
+     print(is_unique("string"))
+     print(is_unique("hello world"))
+     print(is_unique("arstdhneiqwu"))
+   #+END_SRC
+
+   #+RESULTS:
+   : True
+   : False
+   : True
+
+   This algorithm uses a set which takes O(n) space and runs in O(n) time.
+
+** Check Permutation
+
+   Given two strings, write a method to decide if one is a permutation of the other.
+
+   #+BEGIN_SRC python :results output
+     def is_permutation(s1, s2):
+         data1 = {}
+         for char in s1:
+             if char not in data1:
+                 data1[char] = 1
+             else:
+                 data1[char] += 1
+
+         data2 = {}
+         for char in s2:
+             if char not in data1:
+                 return False
+             elif char not in data2:
+                 data2[char] = 1
+             else:
+                 data2[char] += 1
+
+         return data1 == data2
+
+     print(is_permutation("abc", "cba"))
+     print(is_permutation("abc", "abc"))
+     print(is_permutation("abc", "xyz"))
+   #+END_SRC
+
+   #+RESULTS:
+   : True
+   : True
+   : False
+
+   This algorithm has a run-time of O(n + m) where n is the length of the first string and m is the length of the second string.
+
+** URLify
+
+   Write a method to replace all spaces in a string with '%20'. You may assume that the string has sufficient space at the end to hold the additional characters, and that you are given the "true" length of the string.
+
+   #+BEGIN_SRC python :results output
+     def urlify(string, length):
+         return string.strip().replace(" ", "%20")
+
+     print(urlify("much ado about nothing      ", 22))
+     print(urlify("Mr John Smith    ", 13))
+   #+END_SRC
+
+   #+RESULTS:
+   : much%20ado%20about%20nothing
+   : Mr%20John%20Smith
+
+   Assuming that =string.replace()= in Python runs in O(n) time, this algorithm is O(n).
+
+** Palindrome Permutation
+
+   Given a string, write a function to check if it is a permutation of a palindrome. A palindrome is a word or phrase that is the same forwards and backwards. A permutation is a rearrangement of letters. The palindrome does not need to be limited to just dictionary words.
+
+   #+BEGIN_SRC python :results output
+     def is_permutation(string):
+         data = {}
+         string = string.lower().replace(" ", "")
+         for char in string:
+             if char not in data:
+                 data[char] = 1
+             else:
+                 data[char] += 1
+
+         odd_chars = [char for char in data if data[char] % 2 == 1]
+         return len(odd_chars) <= 1
+
+     print(is_permutation("Tact Coa"))
+     print(is_permutation("Tacct ccoa"))
+     print(is_permutation("Tacct cxoa"))
+     print(is_permutation("jhsabckuj ahjsbckj"))
+     print(is_permutation("So patient a nurse to nurse a patient so"))
+     print(is_permutation("no x in nixon"))
+     print(is_permutation("azAZ"))
+   #+END_SRC
+
+   #+RESULTS:
+   : True
+   : True
+   : False
+   : True
+   : False
+   : True
+   : True
+
+   This algorithm has a run-time of O(n) since the maximum number of iterations in the two for-loops and the =replace()= function never exceed the length of the string.
+
+** One Away
+
+   There are three types of edits that can be performed on strings: insert a character, remove a character, or replace a character. Given two strings, write a function to check if they are one edit (or zero edits) away.
+
+   #+BEGIN_SRC python :results output
+     def is_one_away(original, edited):
+         # insert
+         if len(original) + 1 == len(edited):
+             for i, char in enumerate(original):
+                 if char != edited[i]:
+                     return original == edited[:i] + edited[i + 1:]
+             return True
+         # replace
+         elif len(original) == len(edited):
+             for i, char in enumerate(original):
+                 if char != edited[i]:
+                     return original[:i] + original[i + 1:] == edited[:i] + edited[i + 1:]
+             return True
+         # remove
+         elif len(original) - 1 == len(edited):
+             for i, char in enumerate(edited):
+                 if char != original[i]:
+                     return original[:i] + original[i + 1:] == edited
+             return True
+         else:
+             return False
+
+
+     import unittest
+     class Test(unittest.TestCase):
+         """
+         Test cases
+         """
+         data = [
+             ('pale', 'ple', True),
+             ('pales', 'pale', True),
+             ('pale', 'bale', True),
+             ('paleabc', 'pleabc', True),
+             ('pale', 'ble', False),
+             ('a', 'b', True),
+             ('', 'd', True),
+             ('d', 'de', True),
+             ('pale', 'pale', True),
+             ('pale', 'ple', True),
+             ('ple', 'pale', True),
+             ('pale', 'bale', True),
+             ('pale', 'bake', False),
+             ('pale', 'pse', False),
+             ('ples', 'pales', True),
+             ('pale', 'pas', False),
+             ('pas', 'pale', False),
+             ('pale', 'pkle', True),
+             ('pkle', 'pable', False),
+             ('pal', 'palks', False),
+             ('palks', 'pal', False)
+         ]
+
+         def test_one_away(self):
+             for [test_s1, test_s2, expected] in self.data:
+                 actual = is_one_away(test_s1, test_s2)
+                 try:
+                     self.assertEqual(actual, expected)
+                 except AssertionError:
+                     print(test_s1, test_s2, actual, expected)
+
+
+     if __name__ == "__main__":
+         unittest.main()
+   #+END_SRC
+
+   #+RESULTS:
+
+   This algorithm runs in O(n) time because it just loops over the characters of the shortest string.
+
+** String Compression
+
+   Implement a method to perform basic string compression using the counts of repeated characters. For example, the string aabcccccaaa would become a2blc5a3. If the "compressed" string would not become smaller than the original string, your method should return the original string. You can assume the string has only uppercase and lowercase letters (a - z).
+
+   #+BEGIN_SRC python :results output
+     def compress(string):
+         result = ""
+         latest = string[0]
+         count = 1
+         for char in string[1:]:
+             if char != latest:
+                 result += latest + str(count)
+                 latest = char
+                 count = 1
+             else:
+                 count += 1
+                 result += latest + str(count)
+         return result if len(string) > len(result) else string
+
+
+     print(compress("aabcccccaaa"))
+     print(compress("a"))
+   #+END_SRC
+
+   #+RESULTS:
+   : a2b1c5a3
+   : a
+
+   This algorithm runs in O(n) time because it loops over the characters of the string.
+
+** Rotate Matrix
+
+   /Given an image represented by an NxN matrix, where each pixel in the image is 4 bytes, write a method to rotate the image by 90 degrees. Can you do this in place?/
+ 
+*** Imperative
+
+    #+BEGIN_SRC C++ :includes <iostream>
+      #define N 4
+
+      void rotate(int matrix[N][N]) {
+          for (int layer = 0; layer < N / 2; layer++) {
+              int first = layer;
+              int last = N - 1 - layer;
+              for (int i = first; i < last; i++) {
+                  int offset = i - first;
+                  int top = matrix[first][i];
+                  // left -> top
+                  matrix[first][i] = matrix[last - offset][first];
+                  // bottom -> left
+                  matrix[last - offset][first] = matrix[last][last - offset];
+                  // right -> bottom
+                  matrix[last][last - offset] = matrix[i][last];
+                  // top -> right
+                  matrix[i][last] = top;
+              }
+          }
+
+          // print the matrix
+          for (int i = 0; i < N; i++) {
+              for (int j = 0; j < N; j++) {
+                  std::cout << matrix[i][j] << " ";
+              }
+              std::cout << std::endl;
+          }
+      }
+
+      int main() {
+          int matrix[N][N] = {
+              {1, 2, 3, 4},
+              {5, 6, 7, 8},
+              {9, 10, 11, 12},
+              {13, 14, 15, 16}
+          };
+          rotate(matrix);
+          return 0;
+      }
+
+    #+END_SRC
+
+    #+RESULTS:
+    | 13 |  9 | 5 | 1 |
+    | 14 | 10 | 6 | 2 |
+    | 15 | 11 | 7 | 3 |
+    | 16 | 12 | 8 | 4 |
+
+    This algorithm runs in O(n^2) because you need to visit each element of the 2D matrix, where n is the length of the row or column of the matrix.
+
+    I modified the solution in the book but used C++ instead of Java. Due to C++ not being able to determine the size of arrays, I needed to set a constant =N= to 4 at the beginning of the program.
+
+*** Functional
+
+    Here is a much more elegant solution that uses functional programming. The first example uses Common Lisp and I referenced [[https://stackoverflow.com/questions/3513128/transposing-lists-in-common-lisp][this link]] from Stack Overflow.
+
+    The function transposes the matrix and then reverses the rows to rotate the matrix 90 degrees. This is not as efficient as the C++ version since it does not modify the array in place.
+
+    #+BEGIN_SRC lisp
+      (defun rotate (matrix)
+        (mapcar #'reverse (apply #'mapcar #'list matrix)))
+
+      (print (rotate '((1 2 3 4) (5 6 7 8) (9 10 11 12) (13 14 15 16))))
+    #+END_SRC
+
+    #+RESULTS:
+    | 13 |  9 | 5 | 1 |
+    | 14 | 10 | 6 | 2 |
+    | 15 | 11 | 7 | 3 |
+    | 16 | 12 | 8 | 4 |
+
+    Here is the same solution written in JavaScript.
+
+    #+BEGIN_SRC js
+      function rotate(matrix) {
+          return matrix[0].map((column, i) => matrix.map(row => row[i])).map(row => row.reverse());
+      }
+
+      const matrix = [
+          [ 1, 2, 3, 4 ],
+          [ 5, 6, 7, 8 ],
+          [ 9, 10, 11, 12 ],
+          [ 13, 14, 15, 16 ]
+      ];
+
+      const rotated = rotate(matrix);
+
+      for (let i = 0; i < rotated.length; i++) {
+          for (let j = 0; j < rotated.length; j++) {
+              process.stdout.write(rotated[i][j].toString() + " ");
+          }
+          console.log();
+      }
+    #+END_SRC
+
+    #+RESULTS:
+    : 13 9 5 1 
+    : 14 10 6 2 
+    : 15 11 7 3 
+    : 16 12 8 4 
+    : undefined
+
+** Zero Matrix
+
+   /Write an algorithm such that if an element in an MxN matrix is 0, its entire row and column are set to 0./
+
+   #+BEGIN_SRC python :results output
+     def set_zero(matrix):
+         zeros = [] # keep track of the cells that contain a zero
+         for i, row in enumerate(matrix):
+             for j, elem in enumerate(row):
+                 if elem == 0:
+                     zeros.append((i, j))
+         for x, y in zeros:
+             # set row to zero
+             for i, _ in enumerate(matrix[x]):
+                 matrix[x][i] = 0
+                 # set column to zero
+             for i, _ in enumerate(matrix):
+                 matrix[i][y] = 0
+
+         return matrix
+
+
+     matrix = [[1, 2, 3], [4, 5, 6], [0, 8, 9], [10, 0, 12]]
+     zero = set_zero(matrix)
+     for i, row in enumerate(zero):
+         for j, elem in enumerate(row):
+             print(elem, end=" ")
+         print()
+
+
+     import unittest
+     class Test(unittest.TestCase):
+         """Test Cases"""
+         data = [
+             ([
+                 [1, 2, 3, 4, 0],
+                 [6, 0, 8, 9, 10],
+                 [11, 12, 13, 14, 15],
+                 [16, 0, 18, 19, 20],
+                 [21, 22, 23, 24, 25]
+             ], [
+                 [0, 0, 0, 0, 0],
+                 [0, 0, 0, 0, 0],
+                 [11, 0, 13, 14, 0],
+                 [0, 0, 0, 0, 0],
+                 [21, 0, 23, 24, 0]
+             ])
+         ]
+
+         def test_zero_matrix(self):
+             for [test_matrix, expected] in self.data:
+                 actual = set_zero(test_matrix)
+                 try:
+                     self.assertEqual(actual, expected)
+                 except AssertionError:
+                     print("Error:", actual, expected)
+
+     if __name__ == "__main__":
+         unittest.main()
+   #+END_SRC
+
+   #+RESULTS:
+   : 0 0 3
+   : 0 0 6
+   : 0 0 0
+   : 0 0 0
+   
+   This algorithm runs in O(n * m) time because each element in the matrix is visited in the worst case.
+
+** String Rotation
+
+   /Assume you have a method =isSubstring= which checks if one word is a sub-string of another. Given two strings, =s1= and =s2=, write code to check if =s2= is a rotation of =s1= using only one call to =isSubstring= (e.g., "waterbottle" is a rotation of" erbottlewat")./
+
+   #+BEGIN_SRC python :results output
+     def isRotation(s1, s2):
+         return len(s1) == len(s2) and len(s1) > 0 and s2 in s1 + s1
+
+     print(isRotation("waterbottle", "erbottlewat"))
+     print(isRotation("foo", "bar"))
+     print(isRotation("foobar", "barfoo"))
+   #+END_SRC
+
+   #+RESULTS:
+   : True
+   : False
+   : True
+
+   This algorithm runs in constant time but takes O(n) space since =s1 + s1= is stored in a new string.
+
+* Linked Lists
+
+** Remove Dups
+
+   /Write code to remove duplicates from an unsorted linked list./
+  
+   The naive solution involves using a set which automatically removes duplicates.
+   
+   #+BEGIN_SRC C++ :includes <iostream>
+     #include <list>
+     #include <set>
+
+     std::list<int> removeDuplicates(std::list<int> lst) {
+         std::set<int> elements;
+         std::list<int>::iterator iter;
+         for (iter = lst.begin(); iter != lst.end(); iter++) {
+             int item = *iter;
+             elements.insert(item);
+         }
+         std::list<int> result;
+         std::set<int>::iterator setIter;
+         for (setIter = elements.begin(); setIter != elements.end(); setIter++) {
+             result.push_back(*setIter);
+         }
+         return result;
+     }
+
+     int main() {
+         std::list<int> lst;
+         lst.push_back(0);
+         lst.push_back(10);
+         lst.push_back(10);
+         lst.push_back(8);
+         lst.push_back(7);
+         lst.push_back(11);
+         lst.push_back(7);
+         lst = removeDuplicates(lst);
+
+         std::list<int>::iterator iter;
+         for (iter = lst.begin(); iter != lst.end(); iter++) {
+             std::cout << *iter << " ";
+         }
+         std::cout << std::endl;
+         return 0;
+     }
+   #+END_SRC
+
+   #+RESULTS:
+   : 0 7 8 10 11
+   
+   This takes linear time but also takes O(n) space because of the additional data structure.
+
+   The less efficient but constant space solution looks like this:
+
+    #+BEGIN_SRC C++ :includes <iostream>
+      struct Node {
+          int value;
+          Node* next = nullptr;
+      };
+
+      void insert(Node*& head, int n) {
+          Node* newNode = new Node;
+          newNode->value = n;
+          newNode->next = head;
+          head = newNode;
+      }
+
+      void removeDuplicates(Node* lst) {
+          Node* current = lst;
+          while (current != nullptr) {
+              Node* runner = current;
+              while (runner->next != nullptr) {
+                  if (current->value == runner->next->value) {
+                      runner->next = runner->next->next;
+                  } else {
+                      runner = runner->next;
+                  }
+              }
+              current = current->next;
+          }
+      }
+
+      int main() {
+          Node* lst;
+          lst->value = 0;
+          insert(lst, 10);
+          insert(lst, 10);
+          insert(lst, 8);
+          insert(lst, 7);
+          insert(lst, 11);
+          insert(lst, 7);
+          removeDuplicates(lst);
+
+          while (lst != nullptr) {
+              std::cout << lst->value << " ";
+              lst = lst->next;
+          }
+          std::cout << std::endl;
+          return 0;
+      }
+    #+END_SRC
+
+    #+RESULTS:
+    : 7 11 8 10 0
+
+** Return Kth to Last
+
+   /Implement an algorithm to find the kth to last element of a singly linked list./
+ 
+   #+BEGIN_SRC C++ :includes <iostream>
+     struct Node {
+         int value;
+         Node* next = nullptr;
+     };
+
+     void insert(Node*& head, int n) {
+         Node* newNode = new Node;
+         newNode->value = n;
+         newNode->next = head;
+         head = newNode;
+     }
+
+     Node* findKthToLast(Node* head, int k) {
+         if (head == nullptr) return nullptr;
+         Node* forward = head;
+         Node* current = head;
+
+         for (int i = 0; i < k; i++) {
+             if (forward == nullptr) return nullptr;
+             forward = forward->next;
+         }
+
+         while (forward != nullptr) {
+             forward = forward->next;
+             current = current->next;
+         }
+ 
+         return current;
+     }
+
+     int main() {
+         Node* lst = nullptr;
+         insert(lst, 10);
+         insert(lst, 10);
+         insert(lst, 8);
+         insert(lst, 7);
+         insert(lst, 11);
+         insert(lst, 7);
+
+         Node* k = findKthToLast(lst, 3);
+         std::cout << k->value << std::endl;
+
+         return 0;
+     }
+   #+END_SRC
+
+   #+RESULTS:
+   : 8
+
+   This algorithm runs in O(n) time.
+
+** Delete Middle Node
+
+   /Implement an algorithm to delete a node in the middle (i.e., any node but the first and last node, not necessarily the exact middle) of a singly linked list, given only access to that node./
+
+   #+BEGIN_SRC C++ :includes <iostream>
+     struct Node {
+         int value;
+         Node* next = nullptr;
+     };
+
+     void insert(Node*& head, int n) {
+         Node* newNode = new Node;
+         newNode->value = n;
+         newNode->next = head;
+         head = newNode;
+     }
+
+     void deleteMiddle(Node* n) {
+         if (n == nullptr || n->next != nullptr) {
+             Node* temp = n->next;
+             n->value = temp->value;
+             n->next = temp->next;
+             delete temp;
+         }
+     }
+
+     int main() {
+         Node* lst = nullptr;
+         insert(lst, 10);
+         insert(lst, 10);
+         insert(lst, 8);
+         insert(lst, 7);
+         insert(lst, 11);
+         insert(lst, 7);
+
+         deleteMiddle(lst->next);
+
+         while (lst != nullptr) {
+             std::cout << lst->value << " ";
+             lst = lst->next;
+         }
+         std::cout << std::endl;
+
+         return 0;
+     }
+   #+END_SRC
+
+   #+RESULTS:
+   : 7 7 8 10 10
+
+   This algorithm runs in O(n) time.
+ 
+** Partition
+
+   /Write code to partition a linked list around a value x, such that all nodes less than x come before all nodes greater than or equal to x. If x is contained within the list the values of x only need to be after the elements less than x (see below). The partition element x can appear anywhere in the "right partition"; it does not need to appear between the left and right partitions./
+
+   Example:
+
+   Input: 3 -> 5 -> 8 -> 5 -> 10 -> 2 -> 1 [partition = 5]
+
+   Output: 3 -> 1 -> 2 -> 10 -> 5 -> 5 -> 8
+
+*** Imperative
+
+    #+BEGIN_SRC C++ :includes <iostream>
+      struct Node {
+          int value;
+          Node* next = nullptr;
+      };
+
+      void insert(Node*& head, int n) {
+          Node* newNode = new Node;
+          newNode->value = n;
+          newNode->next = head;
+          head = newNode;
+      }
+
+      Node* partition(Node* head, int n) {
+          Node* left = nullptr;
+          Node* right = nullptr;
+          while (head != nullptr) {
+              int val = head->value;
+              if (val < n) {
+                  insert(left, val);
+              } else {
+                  insert(right, val);
+              }
+              head = head->next;
+          }
+
+          // merge the two lists
+          Node* result = nullptr;
+          while (right != nullptr) {
+              insert(result, right->value);
+              right = right->next;
+          }
+          while (left != nullptr) {
+              insert(result, left->value);
+              left = left->next;
+          }
+
+          return result;
+      }
+
+      int main() {
+          Node* lst = nullptr;
+          insert(lst, 10);
+          insert(lst, 8);
+          insert(lst, 7);
+          insert(lst, 11);
+          insert(lst, 10);
+          insert(lst, 7);
+
+          lst = partition(lst, 9);
+
+          while (lst != nullptr) {
+              std::cout << lst->value << " ";
+              lst = lst->next;
+          }
+          std::cout << std::endl;
+
+          return 0;
+      }
+    #+END_SRC
+
+    #+RESULTS:
+    : 7 7 8 10 11 10
+
+    This algorithm runs in O(n) time and requires O(n) space.
+
+*** Functional
+
+    A much more concise solution uses a functional programming approach to filter the list twice and merge the results. This algorithm has the same space and time complexities since it's essentially doing the same thing as the C++ version, but Common Lisp supports list manipulation functions out-of-the-box.
+
+    #+BEGIN_SRC lisp
+      (defun partition (head n)
+        (merge 'list
+               (remove-if-not #'(lambda (value) (< value n)) head)
+               (remove-if-not #'(lambda (value) (>= value n)) head)
+               #'=))
+
+      (partition '(7 10 11 7 8 10) 9)
+    #+END_SRC
+
+    #+RESULTS:
+    | 7 | 7 | 8 | 10 | 11 | 10 |
+
+** Sum Lists
+
+   /You have two numbers represented by a linked list,where each node contains a single digit. The digits are stored in reverse order, such that the 1's digit is at the head of the list. Write a function that adds the two numbers and returns the sum as a linked list./
+
+   #+BEGIN_SRC C++ :includes <iostream>
+     #include <math.h>
+
+     struct Node {
+         int value;
+         Node* next = nullptr;
+     };
+
+     void insert(Node*& head, int n) {
+         Node* newNode = new Node;
+         newNode->value = n;
+         newNode->next = head;
+         head = newNode;
+     }
+
+     Node* sumLists(Node* list1, Node* list2) {
+         int num1 = 0;
+         double place1 = 0.0;
+         while (list1 != nullptr) {
+             num1 += (int) (pow(10.0, place1) + 0.5) * list1->value;
+             list1 = list1->next;
+             place1++;
+         }
+
+         int num2 = 0;
+         double place2 = 0.0;
+         while (list2 != nullptr) {
+             num2 += (int) (pow(10.0, place2) + 0.5) * list2->value;
+             list2 = list2->next;
+             place2++;
+         }
+
+         int sum = num1 + num2;
+         Node* result = nullptr;
+         while (sum > 0) {
+             insert(result, sum % 10);
+             sum /= 10;
+         }
+
+         return result;
+     }
+
+     int main() {
+         Node* n1 = nullptr;
+         insert(n1, 6);
+         insert(n1, 1);
+         insert(n1, 7);
+         Node* n2 = nullptr;
+         insert(n2, 2);
+         insert(n2, 9);
+         insert(n2, 5);
+         Node* sum = sumLists(n1, n2);
+
+         while (sum != nullptr) {
+             std::cout << sum->value << " ";
+             sum = sum->next;
+         }
+         std::cout << std::endl;
+
+         return 0;
+     }
+   #+END_SRC
+
+   #+RESULTS:
+   : 9 1 2
+
+   This technically isn't the right answer since the resulting list is supposed to be in reverse order but I'm too lazy to modify the =insert()= function to add new nodes to the tail instead of the head so I'm just going with this. The core logic of this algorithm is sound and it runs in O(n) time.
+
+** Palindrome
+
+   /Implement a function to check if a linked list is a palindrome./
+
+   #+BEGIN_SRC C++ :includes <iostream>
+     #include <stack>
+
+     struct Node {
+         int value;
+         Node* next = nullptr;
+     };
+
+     void insert(Node*& head, int n) {
+         Node* newNode = new Node;
+         newNode->value = n;
+         newNode->next = head;
+         head = newNode;
+     }
+
+     bool isPalindrome(Node* head) {
+         std::stack<int> numbers;
+         // the fast pointer will reach the end of the list when the slow pointer is at the middle node
+         Node* fast = head;
+         while (fast != nullptr && fast->next != nullptr) {
+             numbers.push(head->value);
+             head = head->next;
+             fast = fast->next->next;
+         }
+
+         // skip the middle node if the length is odd
+         if (fast != nullptr && fast->next == nullptr)
+             head = head->next;
+
+         while (!numbers.empty() && head != nullptr) {
+             int value = numbers.top();
+             numbers.pop();
+             if (value != head->value) return false;
+             head = head->next;
+         }
+
+         return true;
+     }
+
+     int main() {
+         Node* l1 = nullptr;
+         insert(l1, 1);
+         insert(l1, 1);
+         insert(l1, 0);
+         insert(l1, 1);
+         std::cout << isPalindrome(l1) << std::endl;
+
+         Node* l2 = nullptr;
+         insert(l2, 1);
+         insert(l2, 1);
+         insert(l2, 0);
+         insert(l2, 1);
+         insert(l2, 1);
+         std::cout << isPalindrome(l2) << std::endl;
+
+         Node* l3 = nullptr;
+         insert(l3, 1);
+         insert(l3, 1);
+         insert(l3, 0);
+         insert(l3, 0);
+         insert(l3, 1);
+         insert(l3, 1);
+         std::cout << isPalindrome(l3) << std::endl;
+
+         return 0;
+     }
+   #+END_SRC
+
+   #+RESULTS:
+   | 0 |
+   | 1 |
+   | 1 |
+
+   This approach uses a stack to check if the first half of the list has the same elements as the second half. It runs in O(n) time since the list is only traversed once and the stack uses O(n) space.
+ 
+   Since Common Lisp has a built-in function to reverse lists, a different solution becomes far easier to implement.
+
+   #+BEGIN_SRC lisp :results output
+     (defun palindrome? (head)
+       (equalp head (reverse head)))
+
+     (print (palindrome? '(1 1 0 1)))
+     (print (palindrome? '(1 1 0 1 1)))
+     (print (palindrome? '(1 1 0 0 1 1)))
+   #+END_SRC
+
+   #+RESULTS:
+   : 
+   : NIL 
+   : T 
+   : T 
+
+** Intersection
+
+   /Given two (singly) linked lists, determine if the two lists intersect. Return the intersecting node. Note that the intersection is defined based on reference, not value. That is, if the kth node of the first linked list is the exact same node (by reference) as the jth node of the second linked list, then they are intersecting./
+
+   Here is the naive solution:
+
+   #+BEGIN_SRC C++ :includes <iostream>
+     struct Node {
+         int value;
+         Node* next = nullptr;
+     };
+
+     void insert(Node*& head, int n) {
+         Node* newNode = new Node;
+         newNode->value = n;
+         newNode->next = head;
+         head = newNode;
+     }
+
+     Node* findIntersection(Node* list1, Node* list2) {
+         while (list1->next != nullptr) {
+             Node* temp = list2;
+             while (temp->next != nullptr) {
+                 // std::cout << temp->value << std::endl;
+                 if (list1->next == temp->next) return list1->next;
+                 temp = temp->next;
+             }
+             list1 = list1->next;
+         }
+         return nullptr;
+     }
+
+     int main() {
+         Node* list1 = nullptr;
+         insert(list1, 1);
+         insert(list1, 2);
+         insert(list1, 3);
+         insert(list1, 4);
+         insert(list1, 5);
+
+         Node* list2 = nullptr;
+         insert(list2, 1);
+         insert(list2, 5);
+         list2->next->next = list1->next->next->next;
+         insert(list2, 3);
+         insert(list2, 4);
+
+         Node* tempList1 = list1;
+         Node* tempList2 = list2;
+
+         std::cout << "list1: ";
+         while (tempList1 != nullptr) {
+             std::cout << tempList1->value << " ";
+             tempList1 = tempList1->next;
+         }
+         std::cout << std::endl;
+
+         std::cout << "list2: ";
+         while (tempList2 != nullptr) {
+             std::cout << tempList2->value << " ";
+             tempList2 = tempList2->next;
+         }
+         std::cout << std::endl;
+
+         Node* intersection = findIntersection(list1, list2);
+         std::cout << "intersection: " << intersection->value << std::endl;
+
+         return 0;
+     }
+   #+END_SRC
+
+   #+RESULTS:
+   | list1:        | 5 | 4 | 3 | 2 | 1 |   |
+   | list2:        | 4 | 3 | 5 | 1 | 2 | 1 |
+   | intersection: | 2 |   |   |   |   |   |
+
+   This algorithm runs in O(n^2) time since it has to traverse the entire second linked list for each node of the first.
+
+   Here is the optimal solution that runs in O(n + m) time and takes O(1) space:
+
+   #+BEGIN_SRC C++ :includes <iostream>
+     #include <cmath> // for std::abs
+
+     struct Node {
+         int value;
+         Node* next = nullptr;
+     };
+
+     void insert(Node*& head, int n) {
+         Node* newNode = new Node;
+         newNode->value = n;
+         newNode->next = head;
+         head = newNode;
+     }
+
+     int len(Node* head) {
+         int length = 0;
+         while (head != nullptr) {
+             length++;
+             head = head->next;
+         }
+         return length;
+     }
+
+     Node* findIntersection(Node* list1, Node* list2) {
+         int len1 = len(list1);
+         int len2 = len(list2);
+
+         Node* shorter = (len1 < len2) ? list1 : list2;
+         Node* longer = (len1 < len2) ? list2 : list1;
+
+         int i = 0;
+         while (i < std::abs(len1 - len2) && longer != nullptr) {
+             longer = longer->next;
+             i++;
+         }
+
+         // now the two pointers are at the same length
+         while (shorter != nullptr && longer != nullptr) {
+             if (shorter == longer) return shorter;
+             shorter = shorter->next;
+             longer = longer->next;
+         }
+
+         return nullptr;
+     }
+
+     int main() {
+         Node* list1 = nullptr;
+         insert(list1, 1);
+         insert(list1, 2);
+         insert(list1, 3);
+         insert(list1, 4);
+         insert(list1, 5);
+
+         Node* list2 = nullptr;
+         insert(list2, 1);
+         insert(list2, 5);
+         list2->next->next = list1->next->next->next;
+         insert(list2, 3);
+         insert(list2, 4);
+
+         Node* tempList1 = list1;
+         Node* tempList2 = list2;
+
+         std::cout << "list1: ";
+         while (tempList1 != nullptr) {
+             std::cout << tempList1->value << " ";
+             tempList1 = tempList1->next;
+         }
+         std::cout << std::endl;
+
+         std::cout << "list2: ";
+         while (tempList2 != nullptr) {
+             std::cout << tempList2->value << " ";
+             tempList2 = tempList2->next;
+         }
+         std::cout << std::endl;
+
+         Node* intersection = findIntersection(list1, list2);
+         std::cout << "intersection: " << intersection->value << std::endl;
+
+         return 0;
+     }
+   #+END_SRC
+
+   #+RESULTS:
+   | list1:        | 5 | 4 | 3 | 2 | 1 |   |
+   | list2:        | 4 | 3 | 5 | 1 | 2 | 1 |
+   | intersection: | 2 |   |   |   |   |   |
