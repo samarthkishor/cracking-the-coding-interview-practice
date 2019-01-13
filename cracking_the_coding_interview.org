@@ -1069,3 +1069,76 @@ Languages used:
    | list1:        | 5 | 4 | 3 | 2 | 1 |   |
    | list2:        | 4 | 3 | 5 | 1 | 2 | 1 |
    | intersection: | 2 |   |   |   |   |   |
+
+** Loop Detection
+
+   /Given a circular linked list, implement an algorithm that returns the node at the beginning of the loop./
+
+   #+BEGIN_SRC C++
+     #include <iostream>
+
+     struct Node {
+         int value;
+         Node* next = nullptr;
+     };
+
+     /**
+      * Inserts a node at the tail of the linked list
+      */
+     void insert(Node*& head, int data) {
+         Node* newNode = new Node;
+         newNode->value = data;
+         newNode->next = nullptr;
+         if (head == nullptr) {
+             head = newNode;
+         } else {
+             Node* temp = head;
+             while (temp->next != nullptr) {
+                 temp = temp->next;
+             }
+             temp->next = newNode;
+         }
+     }
+
+     Node* findCycle(Node* head) {
+         Node* slow = head;
+         Node* fast = head;
+
+         // break when the pointers meet at LIST_SIZE - (number of iterations)
+         while (fast != nullptr && fast->next != nullptr) {
+             slow = slow->next;
+             fast = fast->next->next;
+             if (slow == fast) break;
+         }
+
+         // check if there is no loop
+         if (fast == nullptr || fast->next == nullptr) return nullptr;
+
+         // the pointers will meet at the start of the loop
+         slow = head;
+         while (slow != fast) {
+             slow = slow->next;
+             fast = fast->next;
+         }
+
+         return fast;
+     }
+
+     int main() {
+         Node* head = nullptr;
+         insert(head, 1);
+         insert(head, 2);
+         insert(head, 3);
+         insert(head, 4);
+         insert(head, 5);
+         head->next->next->next->next->next = head->next; // connect 5 to 2
+         Node* loop = findCycle(head);
+         std::cout << loop->value << std::endl;
+         return 0;
+     }
+   #+END_SRC
+
+   #+RESULTS:
+   : 2
+
+   This algorithm runs in O(n) time.
