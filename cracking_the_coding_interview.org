@@ -10,10 +10,9 @@ Languages used:
 - Common Lisp: great for list manipulations, functional programming, and multi-paradigm programming
 
 * Arrays and Strings
-
 ** Is Unique
 
-   Implement an algorithm to determine if a string has all unique characters. What if you cannot use additional data structures?
+   /Implement an algorithm to determine if a string has all unique characters. What if you cannot use additional data structures?/
 
    #+BEGIN_SRC python :results output
      def is_unique(string):
@@ -33,7 +32,7 @@ Languages used:
 
 ** Check Permutation
 
-   Given two strings, write a method to decide if one is a permutation of the other.
+   /Given two strings, write a method to decide if one is a permutation of the other./
 
    #+BEGIN_SRC python :results output
      def is_permutation(s1, s2):
@@ -69,7 +68,7 @@ Languages used:
 
 ** URLify
 
-   Write a method to replace all spaces in a string with '%20'. You may assume that the string has sufficient space at the end to hold the additional characters, and that you are given the "true" length of the string.
+   /Write a method to replace all spaces in a string with '%20'. You may assume that the string has sufficient space at the end to hold the additional characters, and that you are given the "true" length of the string./
 
    #+BEGIN_SRC python :results output
      def urlify(string, length):
@@ -87,7 +86,7 @@ Languages used:
 
 ** Palindrome Permutation
 
-   Given a string, write a function to check if it is a permutation of a palindrome. A palindrome is a word or phrase that is the same forwards and backwards. A permutation is a rearrangement of letters. The palindrome does not need to be limited to just dictionary words.
+   /Given a string, write a function to check if it is a permutation of a palindrome. A palindrome is a word or phrase that is the same forwards and backwards. A permutation is a rearrangement of letters. The palindrome does not need to be limited to just dictionary words./
 
    #+BEGIN_SRC python :results output
      def is_permutation(string):
@@ -124,7 +123,7 @@ Languages used:
 
 ** One Away
 
-   There are three types of edits that can be performed on strings: insert a character, remove a character, or replace a character. Given two strings, write a function to check if they are one edit (or zero edits) away.
+   /There are three types of edits that can be performed on strings: insert a character, remove a character, or replace a character. Given two strings, write a function to check if they are one edit (or zero edits) away./
 
    #+BEGIN_SRC python :results output
      def is_one_away(original, edited):
@@ -198,7 +197,7 @@ Languages used:
 
 ** String Compression
 
-   Implement a method to perform basic string compression using the counts of repeated characters. For example, the string aabcccccaaa would become a2blc5a3. If the "compressed" string would not become smaller than the original string, your method should return the original string. You can assume the string has only uppercase and lowercase letters (a - z).
+   /Implement a method to perform basic string compression using the counts of repeated characters. For example, the string aabcccccaaa would become a2blc5a3. If the "compressed" string would not become smaller than the original string, your method should return the original string. You can assume the string has only uppercase and lowercase letters (a - z)./
 
    #+BEGIN_SRC python :results output
      def compress(string):
